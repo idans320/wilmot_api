@@ -1,9 +1,18 @@
+@font-face {
+    font-family: 'Hamlet';
+    src: url('/static/fonts/Hamletornot-K7y7.ttf');
+}
 .header{
     align-items: center;
     display: flex;
+    font-family: 'Hamlet', Fallback, sans-serif;
 }
 
 .header img{
     margin-right: 1rem;
-    width: 25%
+    width: 15%
+}
+
+article{
+    padding: 5%;
 }

@@ -1,0 +1,13 @@
+extends layout.pug
+
+block content
+    h3 Services 
+    ul
+        each service in services
+            li
+             a(href="./"+service.name)=service.name
+    h3 Routes
+    ul
+        each route in routes
+            li 
+                a(href="/services"+route+"/")=route
