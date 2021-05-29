@@ -3,6 +3,7 @@ html
         style 
             include ../assests/stylesheet/layout.css
         title Wilmot API
+        script(src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous")
     body 
         div(class="header")
             img(src="/static/images/logo.jpg")
@@ -10,7 +11,4 @@ html
         article 
             block content 
         footer 
-                if path == "/"
-                    a(href="./") Back
-                else 
-                    a(href="../") Back
+            block footer

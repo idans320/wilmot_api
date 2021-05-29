@@ -11,3 +11,8 @@ block content
         each route in routes
             li 
                 a(href="/services"+route+"/")=route
+block footer 
+    if path == "/"
+        a(href="./") Back
+    else 
+        a(href="../") Back

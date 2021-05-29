@@ -3,7 +3,8 @@ import path from "path"
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import services from "./routes/services.js"
- 
+import login from "./routes/login.js"
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const port = 3000
@@ -13,9 +14,7 @@ let app = express()
 
 app.set('view engine', 'pug')
 
-app.get("/login", (req,res) => { 
-
-})
+app.use("/login", login)
 
 app.use("/services",services)
 

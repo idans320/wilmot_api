@@ -16,3 +16,19 @@
 article{
     padding: 5%;
 }
+
+form[action="login"] .container { 
+    display:grid
+}
+
+form[action="login"] .container *{
+    margin-bottom: 1rem;
+}
+
+form[action="login"] .container input{
+    width: 15%;
+}
+
+form[action="login"] .container button{
+    width: 5%;
+}

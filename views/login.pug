@@ -1,0 +1,10 @@
+extends layout.pug
+block content 
+    script !{submit}
+    form(action="login", method="post" id="login_form" onsubmit="return submitLogin(event)") 
+        container(class="container")
+            label(for="username") Username 
+            input(type="text" placeholder="Enter Username" name="username" required)
+            label(for="password") Password
+            input(type="password" placeholder="Enter Password" name="password" required)
+            button(type="submit") Login
