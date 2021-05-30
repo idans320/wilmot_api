@@ -21,5 +21,5 @@ app.use("/services",services)
 app.use("/static",express.static(path.join(__dirname,"assests")))
 
 app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+    
   })

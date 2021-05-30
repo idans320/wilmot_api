@@ -26,16 +26,17 @@ async function submitLogin(e) {
     })
     if (result.status == 200) {
         const json = await result.json()
-        console.log(json)
+        const {token} = json
+        window.localStorage.setItem("token",token)
+        window.location = "/services/"
     }
     else {
-        console.error("Invalid login")
+        alert("Invalid login")
     }
     return false
 }
 
 route.get("/", (req, res) => {
-    console.log(submitLogin)
     res.render("login", { submit: submitLogin })
 })
 
@@ -53,7 +54,5 @@ route.post("/", async (req, res) => {
     else {
         res.sendStatus(401)
     }
-
-
 })
 export default route

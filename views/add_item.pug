@@ -1,0 +1,15 @@
+extends layout.pug
+block content
+    if !tokenSent
+        script !{sendAuthorization}
+        script sendAuthorization(window.location, true)
+    else if !isValid
+        script window.location.href="/login/"
+    script !{submitData}
+    form(action="./", method="post" id="add_item_form" onsubmit="return submitData(event)") 
+        container(class="container")
+            label(for="name") Service name:
+            input(type="text" placeholder="Enter service name" name="name" required)
+            label(for="json") JSON:
+            textarea(name="data", cols="30", rows="10" required)
+            button(type="submit") Submit Data

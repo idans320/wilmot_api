@@ -18,3 +18,13 @@ export const signToken = async (user) => {
     await token.sign()
     return token.toString()
 }
+
+export const verify = async (token) => {
+    try{ 
+    const jws = JWS.default.fromString(token, provider);
+    
+    return await jws.valid()
+    } catch(e){
+        return false
+    }
+}

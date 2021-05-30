@@ -1,6 +1,8 @@
 extends layout.pug
-
 block content
+    if !tokenSent
+        script !{sendAuthorization}
+        script sendAuthorization(window.location, false)
     h3 Services 
     ul
         each service in services
@@ -13,6 +15,10 @@ block content
                 a(href="/services"+route+"/")=route
 block footer 
     if path == "/"
-        a(href="./") Back
+        a(href="#") Back
     else 
         a(href="../") Back
+    if isValid
+        a(href="./add_item") Add Item
+    else 
+        a(href="/login") Login

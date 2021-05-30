@@ -7,27 +7,15 @@ export default {
     "default": {},
     "examples": [
         {
-            "route": "/",
             "name": "sample object",
             "data": {}
         }
     ],
     "required": [
-        "route",
         "name",
         "data"
     ],
     "properties": {
-        "route": {
-            "$id": "#/properties/route",
-            "type": "string",
-            "title": "The route schema",
-            "description": "Set the route for the service",
-            "default": "",
-            "examples": [
-                "/"
-            ]
-        },
         "name": {
             "$id": "#/properties/name",
             "type": "string",

@@ -17,18 +17,27 @@ article{
     padding: 5%;
 }
 
-form[action="login"] .container { 
+form .container { 
     display:grid
+
 }
 
-form[action="login"] .container *{
+form .container *{
     margin-bottom: 1rem;
 }
 
-form[action="login"] .container input{
+form .container input{
     width: 15%;
 }
 
-form[action="login"] .container button{
-    width: 5%;
+form .container button{
+    width: 10%;
+}
+
+footer { 
+    padding : 3%
+}
+
+footer *{ 
+    margin-right : 1rem;
 }
