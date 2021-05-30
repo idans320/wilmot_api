@@ -20,6 +20,10 @@ app.use("/services",services)
 
 app.use("/static",express.static(path.join(__dirname,"assests")))
 
+app.get("/",(req,res) => { 
+  res.redirect("/services/")
+})
+
 app.listen(port, () => {
     
   })

@@ -80,6 +80,9 @@ route.get('/:path*?', async function (req, res) {
         return res.send(service.data)
     }
     else{
+        if (!req.originalUrl.endsWith("/")){
+            res.redirect(req.originalUrl + "/")
+        }
         let services = await db.services.getServicesInRoute(route)
         res.render('services', {services: services, routes : routes, path:route, isValid:isValid, tokenSent: Boolean(token),sendAuthorization:sendAuthorization})
     }
