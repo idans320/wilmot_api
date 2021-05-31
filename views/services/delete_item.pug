@@ -1,4 +1,4 @@
-extends layout.pug
+extends ../layout.pug
 block content
     if !tokenSent
         script !{sendAuthorization}
@@ -8,7 +8,7 @@ block content
     script !{submitData}
     form(action="./", method="delete" id="delete_item_form" onsubmit="return submitData(event,'delete',true)") 
         container(class="container")
-            label(for="name") Services:
+            label(for="name") Service:
             select(name="name" id="serviceName")
                 for service in services
                     option(value=service.name)=service.name

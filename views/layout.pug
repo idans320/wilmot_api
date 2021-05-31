@@ -11,4 +11,8 @@ html
         article 
             block content 
         footer 
+            if path == "/"
+                a(href="#") Back
+            else 
+                a(href="../") Back
             block footer

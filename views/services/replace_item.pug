@@ -1,4 +1,4 @@
-extends layout.pug
+extends ../layout.pug
 block content
     if !tokenSent
         script !{sendAuthorization}
@@ -6,10 +6,12 @@ block content
     else if !isValid
         script window.location.href="/login/"
     script !{submitData}
-    form(action="./", method="post" id="add_item_form" onsubmit="return submitData(event,'post',false)") 
+    form(action="./", method="post" id="add_item_form" onsubmit="return submitData(event,'put',true, true)") 
         container(class="container")
-            label(for="name") Service name:
-            input(type="text" placeholder="Enter service name" name="name" required)
-            label(for="json") JSON:
+            label(for="name") Service:
+            select(name="name" id="serviceName")
+                for service in services
+                    option(value=service.name)=service.name
+            label(for="data") JSON:
             textarea(name="data", cols="30", rows="10" required)
             button(type="submit") Submit Data

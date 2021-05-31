@@ -1,5 +1,5 @@
 import Ajv from "ajv";
-import { Router } from "express"
+import e, { Router } from "express"
 import DATA_SERVICE_SCHEMA from "../schema/data_service.js"
 import db from "../shared/db.js"
 import express from "express"
@@ -34,7 +34,7 @@ const sendAuthorization = async function sendAuthorization(path, redirect) {
     }
 }
 
-const submitData = async function submitData(e, method, service) {
+const submitData = async function submitData(e, method, service, send_body) {
     e.preventDefault();
     const token = window.localStorage.getItem("token")
 
@@ -44,9 +44,10 @@ const submitData = async function submitData(e, method, service) {
     $.map(unindexed_array, function (n, i) {
         indexed_array[n['name']] = n['value'];
     });
-    const url = window.location.pathname + "/../" + (service? indexed_array["name"] : "")
+    console.log(window.location.pathname)
+    const url = window.location.pathname + "/../" + (service ? indexed_array["name"] : "")
     indexed_array["data"] = indexed_array["data"] ? JSON.parse(indexed_array["data"]) : {}
-    const body = service ? null : JSON.stringify(indexed_array)
+    const body = !send_body ? null : JSON.stringify(indexed_array)
     const result = await fetch(url, {
         method: method, body: body, headers: {
             'Content-Type': 'application/json',
@@ -64,26 +65,46 @@ const submitData = async function submitData(e, method, service) {
 
 route.use(express.json())
 
+
+route.get(/(.*)/, async function (req, res) {
+    const route = getRoute(req)
+    console.log(req.path)
+    let service = await getServiceFromRoute(req.path)
+    if (!req.originalUrl.endsWith("/") && !service) {
+        return res.redirect(req.originalUrl + "/")
+    } else {
+        req.next()
+    }
+})
+
 route.get('/:path*?/add_item', async function (req, res) {
     const token = req.headers.authorization
     const isValid = token ? await verify(token) : false
-
-    res.render("add_item", { isValid: isValid, tokenSent: Boolean(token), sendAuthorization: sendAuthorization, submitData: submitData })
+    res.render("services/add_item", { isValid: isValid, path: req.pathname, tokenSent: Boolean(token), sendAuthorization: sendAuthorization, submitData: submitData })
 })
 
 route.get('/:path*?/delete_item', async function (req, res) {
     const route = getRoute(req)
-        .replace("/delete_item", "")
+    const token = req.headers.authorization
+    console.log(req.path)
+    const isValid = token ? await verify(token) : false
+    let services = await db.services.getServicesInRoute(route)
+    res.render("services/delete_item", { isValid: isValid, path: req.pathname, services: services, tokenSent: Boolean(token), sendAuthorization: sendAuthorization, submitData: submitData })
+})
+
+route.get('/:path*?/replace_item', async function (req, res) {
+    const route = getRoute(req)
     const token = req.headers.authorization
     const isValid = token ? await verify(token) : false
     let services = await db.services.getServicesInRoute(route)
-    res.render("delete_item", { isValid: isValid, services: services, tokenSent: Boolean(token), sendAuthorization: sendAuthorization, submitData: submitData })
+    res.render("services/replace_item", { isValid: isValid, services: services, path: req.pathname, tokenSent: Boolean(token), sendAuthorization: sendAuthorization, submitData: submitData })
 })
 
 const getRoute = (req) => {
     let route = req.params["path"] ? ("/" + (req.params["path"]) + (req.params[0] ? req.params[0] : "")) : "/"
     return route.endsWith("/") ? route : route + "/"
 }
+
 
 route.get('/:path*?', async function (req, res) {
     const token = req.headers.authorization
@@ -96,9 +117,6 @@ route.get('/:path*?', async function (req, res) {
         return res.send(service.data)
     }
     else {
-        if (!req.originalUrl.endsWith("/")) {
-            return res.redirect(req.originalUrl + "/")
-        }
         let services = await db.services.getServicesInRoute(route)
         res.render('services', { services: services, routes: routes, path: route, isValid: isValid, tokenSent: Boolean(token), sendAuthorization: sendAuthorization })
     }
@@ -142,7 +160,26 @@ route.delete("/:path?*", async function (req, res) {
             res.sendStatus(404)
         }
     }
-}
-)
+})
+
+route.put("/:path?*", async function (req, res) {
+    const token = req.headers.authorization
+    const isValid = token ? await verify(token) : false
+    if (isValid) {
+        const data = req.body
+        const route = getRoute(req)
+        const validate = ajv.compile(DATA_SERVICE_SCHEMA)
+        let service = await getServiceFromRoute(route)
+        data.route = service.route
+        if (validate(data)) {
+            if (service) {
+                res.sendStatus(201)
+                db.services.replaceService(data)
+            } else {
+                res.sendStatus(404)
+            }
+        }
+    }
+})
 
 export default route
