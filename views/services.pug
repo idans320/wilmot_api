@@ -12,7 +12,7 @@ block content
     ul
         each route in routes
             li 
-                a(href="/services"+route+"/")=route
+                a(href="/services"+route)=route
 block footer 
     if path == "/"
         a(href="#") Back
@@ -20,5 +20,6 @@ block footer
         a(href="../") Back
     if isValid
         a(href="./add_item") Add Item
+        a(href="./delete_item") Delete Item
     else 
         a(href="/login") Login

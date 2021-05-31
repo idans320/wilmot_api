@@ -34,6 +34,11 @@ form .container button{
     width: 10%;
 }
 
+form select{
+    width: 10%;
+}
+
+
 footer { 
     padding : 3%
 }

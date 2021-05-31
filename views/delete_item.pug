@@ -1,0 +1,15 @@
+extends layout.pug
+block content
+    if !tokenSent
+        script !{sendAuthorization}
+        script sendAuthorization(window.location, true)
+    else if !isValid
+        script window.location.href="/login/"
+    script !{submitData}
+    form(action="./", method="delete" id="delete_item_form" onsubmit="return submitData(event,'delete')") 
+        container(class="container")
+            label(for="name") Services:
+            select(name="name" id="serviceName")
+                for service in services
+                    option(value=service.name)=service.name
+            button(type="submit") Delete Service

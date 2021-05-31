@@ -6,7 +6,7 @@ block content
     else if !isValid
         script window.location.href="/login/"
     script !{submitData}
-    form(action="./", method="post" id="add_item_form" onsubmit="return submitData(event)") 
+    form(action="./", method="post" id="add_item_form" onsubmit="return submitData(event,'post')") 
         container(class="container")
             label(for="name") Service name:
             input(type="text" placeholder="Enter service name" name="name" required)
