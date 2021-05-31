@@ -44,8 +44,7 @@ const submitData = async function submitData(e, method, service, send_body) {
     $.map(unindexed_array, function (n, i) {
         indexed_array[n['name']] = n['value'];
     });
-    console.log(window.location.pathname)
-    const url = window.location.pathname + "/../" + (service ? indexed_array["name"] : "")
+    const url = window.location.pathname + "../" + (service ? indexed_array["name"] : "")
     indexed_array["data"] = indexed_array["data"] ? JSON.parse(indexed_array["data"]) : {}
     const body = !send_body ? null : JSON.stringify(indexed_array)
     const result = await fetch(url, {
@@ -55,7 +54,7 @@ const submitData = async function submitData(e, method, service, send_body) {
         }
     })
     if (result.status == 201) {
-        window.location.href = window.location.pathname + "/../"
+        window.location.href = window.location.pathname + "../"
     }
     else {
         alert("Invalid Request")
@@ -68,7 +67,6 @@ route.use(express.json())
 
 route.get(/(.*)/, async function (req, res) {
     const route = getRoute(req)
-    console.log(req.path)
     let service = await getServiceFromRoute(req.path)
     if (!req.originalUrl.endsWith("/") && !service) {
         return res.redirect(req.originalUrl + "/")
@@ -86,7 +84,6 @@ route.get('/:path*?/add_item', async function (req, res) {
 route.get('/:path*?/delete_item', async function (req, res) {
     const route = getRoute(req)
     const token = req.headers.authorization
-    console.log(req.path)
     const isValid = token ? await verify(token) : false
     let services = await db.services.getServicesInRoute(route)
     res.render("services/delete_item", { isValid: isValid, path: req.pathname, services: services, tokenSent: Boolean(token), sendAuthorization: sendAuthorization, submitData: submitData })

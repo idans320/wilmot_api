@@ -1,0 +1,1 @@
+cd scripts && node add_user $wilmot_admin $password
