@@ -5,6 +5,7 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
+    "prestart": "mongod",
     "start": "nodemon --exec babel-node index.js"
   },
   "dependencies": {
