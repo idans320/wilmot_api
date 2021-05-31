@@ -6,7 +6,7 @@ block content
     else if !isValid
         script window.location.href="/login/"
     script !{submitData}
-    form(action="./", method="delete" id="delete_item_form" onsubmit="return submitData(event,'delete')") 
+    form(action="./", method="delete" id="delete_item_form" onsubmit="return submitData(event,'delete',true)") 
         container(class="container")
             label(for="name") Services:
             select(name="name" id="serviceName")

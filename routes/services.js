@@ -34,9 +34,8 @@ const sendAuthorization = async function sendAuthorization(path, redirect) {
     }
 }
 
-const submitData = async function submitData(e, method) {
+const submitData = async function submitData(e, method, service) {
     e.preventDefault();
-    debugger
     const token = window.localStorage.getItem("token")
 
     let unindexed_array = $(e.target).serializeArray();
@@ -45,16 +44,17 @@ const submitData = async function submitData(e, method) {
     $.map(unindexed_array, function (n, i) {
         indexed_array[n['name']] = n['value'];
     });
-    const url = window.location.pathname + "/../"
+    const url = window.location.pathname + "/../" + (service? indexed_array["name"] : "")
     indexed_array["data"] = indexed_array["data"] ? JSON.parse(indexed_array["data"]) : {}
+    const body = service ? null : JSON.stringify(indexed_array)
     const result = await fetch(url, {
-        method: method, body: JSON.stringify(indexed_array), headers: {
+        method: method, body: body, headers: {
             'Content-Type': 'application/json',
             "authorization": token
         }
     })
     if (result.status == 201) {
-        window.location.href = "../"
+        window.location.href = window.location.pathname + "/../"
     }
     else {
         alert("Invalid Request")
@@ -80,7 +80,7 @@ route.get('/:path*?/delete_item', async function (req, res) {
     res.render("delete_item", { isValid: isValid, services: services, tokenSent: Boolean(token), sendAuthorization: sendAuthorization, submitData: submitData })
 })
 
-const getRoute = (req) => {    
+const getRoute = (req) => {
     let route = req.params["path"] ? ("/" + (req.params["path"]) + (req.params[0] ? req.params[0] : "")) : "/"
     return route.endsWith("/") ? route : route + "/"
 }
@@ -134,20 +134,15 @@ route.delete("/:path?*", async function (req, res) {
     const isValid = token ? await verify(token) : false
     if (isValid) {
         const route = getRoute(req)
-        const data = req.body
-        if (data.name) {
-            let service = await db.services.getServiceByRouteAndName(route, data.name)
-            if (service) {
-                data.route = route
-                res.sendStatus(201)
-                db.services.deleteService(data)
-            } else {
-                res.sendStatus(404)
-            }
+        let service = await getServiceFromRoute(route)
+        if (service) {
+            res.sendStatus(201)
+            db.services.deleteService(service)
         } else {
-            res.sendStatus(400)
+            res.sendStatus(404)
         }
     }
-})
+}
+)
 
 export default route
