@@ -46,9 +46,9 @@ route.post("/", async (req, res) => {
         return res.sendStatus(400)
     }
     const { username, password } = req.body
-    const validLogin = await db.users.login(username, password)
-    if (validLogin) {
-        const token = await signToken(username)
+    const db_user = await db.users.login(username, password)
+    if (db_user) {
+        const token = await signToken(username,db_user.role)
         res.send({ "token": token })
     }
     else {

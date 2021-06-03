@@ -9,11 +9,11 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const provider = FileProvider.default(path.join(__dirname,'../private.pem'), path.join(__dirname,'../public.pem'));
 
 
-export const signToken = async (user) => {
+export const signToken = async (user, role) => {
     const token = new JWS.default(provider);
     token.useAlghoritm(JWTAlghoritm.RS256);
     token.setClaims({
-        user: user,
+        user, role
     });
     await token.sign()
     return token.toString()
@@ -27,4 +27,9 @@ export const verify = async (token) => {
     } catch(e){
         return false
     }
+}
+
+export const decode = async(token) => {
+    const jws = JWS.default.fromString(token, provider);
+    return await jws.getClaims()
 }
