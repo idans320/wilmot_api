@@ -33,3 +33,16 @@ export const decode = async(token) => {
     const jws = JWS.default.fromString(token, provider);
     return await jws.getClaims()
 }
+
+export const sendAuthorization = async function sendAuthorization(path, redirect) {
+    const token = window.localStorage.getItem("token")
+    if (token) {
+        const request = await (await fetch(path, { headers: { authorization: token } })).text()
+        document.open()
+        document.write(request)
+        document.close()
+    }
+    else if (redirect) {
+        window.location.href = "/login/";
+    }
+}

@@ -4,6 +4,7 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import services from "./routes/services.js"
 import login from "./routes/login.js"
+import admin from "./routes/admin.js"
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -17,6 +18,8 @@ app.set('view engine', 'pug')
 app.use("/login", login)
 
 app.use("/services",services)
+
+app.use("/admin",admin)
 
 app.use("/static",express.static(path.join(__dirname,"assests")))
 

@@ -37,6 +37,18 @@ export default {
             ],
             "required": [],
             "additionalProperties": true
+        },
+        "role": {
+            "$id": "#/properties/data",
+            "type": ["array","object"],
+            "title": "The data schema",
+            "description": "Service data",
+            "default": {},
+            "examples": [
+                [{"name":"test"}]
+            ],
+            "required": [],
+            "additionalProperties": true
         }
     },
     "additionalProperties": true

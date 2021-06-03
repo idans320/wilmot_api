@@ -1,0 +1,13 @@
+extends ../layout.pug
+block content
+    if !tokenSent
+        script !{sendAuthorization}
+        script sendAuthorization(window.location, true)
+    else if !isValid
+        script window.location.href="/login/"
+    script !{submitData}
+    form(action="./", method="post" id="add_role_form" onsubmit="return submitData(event,'post',false, true)") 
+            container(class="container")
+                label(for="username") Role name 
+                input(type="text" placeholder="Role name" name="roleName" required)
+                button(type="submit") Add role

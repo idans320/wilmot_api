@@ -12,4 +12,11 @@ block content
             input(type="text" placeholder="Enter service name" name="name" required)
             label(for="json") JSON:
             textarea(name="data", cols="30", rows="10" required)
+            if user_role == "admin"
+                select(name="role" id="roleName")
+                    for role in roles
+                        option(value=role)=role
+            else
+                select(name="role" id="roleName" disabled)
+                        option(value=user_role)=user_role
             button(type="submit") Submit Data

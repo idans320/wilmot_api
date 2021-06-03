@@ -1,0 +1,18 @@
+extends ../layout.pug
+block content
+    if !tokenSent
+        script !{sendAuthorization}
+        script sendAuthorization(window.location, true)
+    else if !isValid
+        script window.location.href="/login/"
+    script !{submitData}
+    form(action="./", method="post" id="add_role_form" onsubmit="return submitData(event,'post',false, true)") 
+        container(class="container")
+            label(for="username") Username 
+            input(type="text" placeholder="Enter Username" name="username" required)
+            label(for="password") Password
+            input(type="password" placeholder="Enter Password" name="password" required)
+            select(name="role" id="roleName")
+                    for role in roles
+                        option(value=role)=role
+            button(type="submit") Register
