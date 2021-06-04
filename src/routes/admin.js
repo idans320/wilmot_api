@@ -5,7 +5,6 @@ import db from "../shared/db.js"
 import express from "express"
 import path from "path"
 import { verify, decode, sendAuthorization } from "../shared/jws.js"
-import $ from "jquery"
 import { admin } from "../shared/consts.js";
 
 const ajv = new Ajv()

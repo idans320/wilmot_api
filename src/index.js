@@ -6,8 +6,6 @@ import services from "./routes/services.js"
 import login from "./routes/login.js"
 import admin from "./routes/admin.js"
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
 const port = 3000
 
 let app = express()
@@ -21,7 +19,7 @@ app.use("/services",services)
 
 app.use("/admin",admin)
 
-app.use("/static",express.static(path.join(__dirname,"assests")))
+app.use("/static",express.static(path.join(__dirname,"../","assests")))
 
 app.get("/",(req,res) => { 
   res.redirect("/services/")
@@ -29,4 +27,6 @@ app.get("/",(req,res) => {
 
 app.listen(port, () => {
     
-  })
+})
+
+export default app
