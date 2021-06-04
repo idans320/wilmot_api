@@ -1,1 +1,1 @@
-cd scripts && node add_user $wilmot_admin $password
+cd dist/scripts && node add_user $wilmot_admin $password

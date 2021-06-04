@@ -5,7 +5,6 @@ import db from "../shared/db.js"
 import express from "express"
 import path from "path"
 import { verify, sendAuthorization, decode } from "../shared/jws.js"
-import $ from "jquery"
 import { admin } from "../shared/consts.js";
 
 const ajv = new Ajv()
@@ -83,7 +82,7 @@ route.get('/:path*?/delete_item', async function (req, res) {
     const isValid = token ? await verify(token) : false
     if (isValid)
         role = (await decode(token)).role;
-    let services = await db.services.getServicesInRoute(route).filter((e) => (role == admin || e.role == role))
+    let services = (await db.services.getServicesInRoute(route)).filter((e) => (role == admin || e.role == role))
     res.render("services/delete_item", { isValid: isValid, path: req.pathname, services: services, tokenSent: Boolean(token), sendAuthorization: sendAuthorization, submitData: submitData })
 })
 
@@ -94,7 +93,7 @@ route.get('/:path*?/replace_item', async function (req, res) {
     const isValid = token ? await verify(token) : false
     if (isValid)
         role = (await decode(token)).role;
-    let services = await db.services.getServicesInRoute(route).filter((e) => (role == admin || e.role == role))
+    let services = (await db.services.getServicesInRoute(route)).filter((e) => (role == admin || e.role == role))
     res.render("services/replace_item", { isValid: isValid, services: services, path: req.pathname, tokenSent: Boolean(token), sendAuthorization: sendAuthorization, submitData: submitData })
 })
 

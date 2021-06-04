@@ -1,7 +1,6 @@
 import { Router } from "express"
 import express from "express"
 import db from "../shared/db.js"
-import $ from "jquery"
 import USER_MODEL from "../schema/user_model.js"
 import Ajv from "ajv";
 import { signToken } from "../shared/jws.js"
