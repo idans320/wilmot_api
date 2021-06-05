@@ -13,7 +13,8 @@ export default {
     ],
     "required": [
         "name",
-        "data"
+        "data",
+        "role"
     ],
     "properties": {
         "name": {

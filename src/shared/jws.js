@@ -6,11 +6,11 @@ import path from "path"
 
 const provider = FileProvider(path.join(__dirname,'../../private.pem'), path.join(__dirname,'../../public.pem'));
 
-export const signToken = async (user, role) => {
+export const signToken = async (user, role, editor) => {
     const token = new JWS(provider);
     token.useAlghoritm(JWTAlghoritm.RS256);
     token.setClaims({
-        user, role
+        user, role, editor
     });
     await token.sign()
     return token.toString()

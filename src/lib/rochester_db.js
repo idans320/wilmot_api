@@ -1,11 +1,11 @@
-import MongoClient  from "mongodb"
+import MongoClient from "mongodb"
 import _ from "lodash"
 import bcrypt, { hash } from "bcrypt"
 
 const saltRounds = 10;
 
 export default class RochesterDB {
-    async connect(host,port){
+    async connect(host, port) {
         const url = `mongodb://${host}:${port}`;
         const dbName = 'rochester';
         this.client = await MongoClient.connect(url);
@@ -15,20 +15,20 @@ export default class RochesterDB {
         if (port == undefined) {
             port = 27017
         }
-        this.connect(host,port)
+        this.connect(host, port)
     }
     roles = {
         addRole: async (roleName) => {
             let collection = this.db.collection("roles")
-            await collection.insertOne({roleName})
+            await collection.insertOne({ roleName })
         },
-        isRoleExist : async (roleName) => {
-            let collection = this.db.collection("roles") 
-            let role = await collection.findOne({"roleName":{'$regex' : `^${roleName}$`, '$options' : 'i'}})
+        isRoleExist: async (roleName) => {
+            let collection = this.db.collection("roles")
+            let role = await collection.findOne({ "roleName": { '$regex': `^${roleName}$`, '$options': 'i' } })
             return Boolean(role)
         },
         getRoles: async () => {
-            let collection = this.db.collection("roles") 
+            let collection = this.db.collection("roles")
             let role = await collection.find({}).toArray()
             return role.map((e) => e.roleName)
         }
@@ -38,26 +38,26 @@ export default class RochesterDB {
             let collection = this.db.collection("services")
             return await collection.find({ "route": route }).toArray()
         },
-        getServiceByRouteAndName : async (route, name) => {
+        getServiceByRouteAndName: async (route, name) => {
             let collection = this.db.collection("services")
-            
-            
-            return await collection.findOne({"name":{'$regex' : `^${name}$`, '$options' : 'i'},"route":route})
+
+
+            return await collection.findOne({ "name": { '$regex': `^${name}$`, '$options': 'i' }, "route": route })
         },
         getChildrenRoutes: async (route) => {
             let collection = this.db.collection("services")
             let regex = new RegExp(`/${route}[^\/]*/`)
-            let services = await collection.find({ "route": {'$regex' : `${route}[^\/]*` } }).toArray()
+            let services = await collection.find({ "route": { '$regex': `${route}[^\/]*` } }).toArray()
             return _.uniq(services.map((e) => e.route)).filter((e) => e != route)
         },
         deleteService: async (data) => {
             let collection = this.db.collection("services")
-            await collection.deleteOne({"name":{'$regex' : `^${data.name}$`, '$options' : 'i'},"route":data.route})
+            await collection.deleteOne({ "name": { '$regex': `^${data.name}$`, '$options': 'i' }, "route": data.route })
         },
-        replaceService: async (data) => {
+        replaceService: async (name,route,data) => {
             let collection = this.db.collection("services")
             console.log(data)
-            await collection.findOneAndReplace({"name":{'$regex' : `^${data.name}$`, '$options' : 'i'},"route":data.route},data)
+            await collection.findOneAndUpdate({ "name": { '$regex': `^${name}$`, '$options': 'i' }, "route": route }, { "$set": { data } })
         },
         addService: async (data) => {
             let collection = this.db.collection("services")
@@ -65,30 +65,30 @@ export default class RochesterDB {
         }
     }
     users = {
-        register : async (user,password,role) => {
+        register: async (user, password, role, editor) => {
             if (role === undefined)
                 role = null;
             const salt = await bcrypt.genSalt(saltRounds)
             const hash = await bcrypt.hash(password, salt)
             const collection = this.db.collection("users")
-            const db_user = await collection.findOne({user:user})
-            if (!db_user){
-                await collection.insertOne({user:user,hash,role})
+            const db_user = await collection.findOne({ user: user })
+            if (!db_user) {
+                await collection.insertOne({ user, hash, role, editor })
                 return true
             }
-            else{
+            else {
                 return false
             }
         },
-        login : async( user, password) => {
+        login: async (user, password) => {
             const collection = this.db.collection("users")
-            const db_user = await collection.findOne({user:user})
-            
-            return (await bcrypt.compare(password, db_user.hash))? db_user : false
+            const db_user = await collection.findOne({ user: user })
+
+            return (await bcrypt.compare(password, db_user.hash)) ? db_user : false
         },
-        getUserData : async (user) => {
+        getUserData: async (user) => {
             const collection = this.db.collection("users")
-            const db_user = await collection.findOne({user:user})
+            const db_user = await collection.findOne({ user: user })
             delete db_user["hash"]
             return db_user
         }

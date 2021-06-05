@@ -1,4 +1,4 @@
 export default {
-    'user': 'user',
-    'password':'password'
+    'user': 'admin',
+    'password':'alaskadj30'
 }

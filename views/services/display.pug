@@ -1,0 +1,7 @@
+if !tokenSent
+    script !{sendAuthorization}
+    script sendAuthorization(window.location, true)
+else if !isValid
+    p you are not authorized to see that service 
+else 
+    p=data
