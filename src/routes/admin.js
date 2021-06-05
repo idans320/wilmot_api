@@ -13,6 +13,14 @@ let route = Router();
 
 route.use(express.json())
 
+route.get(/(.*)/, async function (req, res) {
+    if (!req.originalUrl.endsWith("/")) {
+        return res.redirect(req.originalUrl + "/")
+    } else {
+        req.next()
+    }
+})
+
 const submitData = async function submitData(e, method) {
     e.preventDefault();
     const token = window.localStorage.getItem("token")
@@ -33,6 +41,7 @@ const submitData = async function submitData(e, method) {
     })
     if (result.status == 201) {
         console.log("Added successfuly")
+        window.location.href = "../"
     }
     else {
         alert("Invalid Request")
@@ -61,6 +70,13 @@ const isAdmin = async (token) => {
     return authorized
 }
 
+route.get("/", async (req, res) => {
+    const token = req.headers.authorization
+    const authorized = await isAdmin(token)
+    res.render('admin', { isValid: authorized, tokenSent: Boolean(token), sendAuthorization, submitData })
+})
+
+
 route.get("/add_role", async (req, res) => {
     const token = req.headers.authorization
     const authorized = await isAdmin(token)
@@ -77,9 +93,9 @@ route.get("/add_user", async (req, res) => {
 route.post("/add_user", async (req, res) => {
     const authorized = await isAdmin(req.headers.authorization)
     if (authorized) {
-        const { username, password, role } = req.body
+        const { username, password, role, editor } = req.body
         if (username && password && role) {
-            if ((await db.users.register(username,password,role))) {
+            if ((await db.users.register(username, password, role, Boolean(editor)))) {
                 res.sendStatus(201)
             } else
                 res.sendStatus(409)

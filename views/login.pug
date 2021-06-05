@@ -1,5 +1,10 @@
 extends layout.pug
 block content 
+    if !tokenSent
+        script !{sendAuthorization}
+        script sendAuthorization(window.location, false)
+    else if isValid
+        script window.location.href="/"
     script !{submit}
     form(action="login", method="post" id="login_form" onsubmit="return submitLogin(event)") 
         container(class="container")

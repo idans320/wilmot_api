@@ -1,6 +1,6 @@
 import db from "../shared/db.js";
 import assert from "assert"
-import { admin } from "../shared/consts.js";
+import {admin} from "../shared/consts.js";
 
 var args = process.argv.slice(2);
 
