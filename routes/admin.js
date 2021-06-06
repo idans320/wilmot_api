@@ -34,6 +34,7 @@ const submitData = async function submitData(e, method) {
     })
     if (result.status == 201) {
         console.log("Added successfuly")
+        window.location.href = "../"
     }
     else {
         alert("Invalid Request")
