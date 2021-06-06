@@ -13,7 +13,8 @@ export default {
     ],
     "required": [
         "name",
-        "data"
+        "data",
+        "role"
     ],
     "properties": {
         "name": {
@@ -39,13 +40,13 @@ export default {
             "additionalProperties": true
         },
         "role": {
-            "$id": "#/properties/data",
-            "type": ["array","object"],
+            "$id": "#/properties/role",
+            "type": ["string"],
             "title": "The data schema",
-            "description": "Service data",
+            "description": "Service role",
             "default": {},
             "examples": [
-                [{"name":"test"}]
+                "test"
             ],
             "required": [],
             "additionalProperties": true

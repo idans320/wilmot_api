@@ -1,10 +1,11 @@
 import { Router } from "express"
 import express from "express"
 import db from "../shared/db.js"
-import $ from "jquery"
 import USER_MODEL from "../schema/user_model.js"
 import Ajv from "ajv";
 import { signToken } from "../shared/jws.js"
+import { admin } from "../shared/consts.js";
+import { verify, sendAuthorization } from "../shared/jws.js"
 
 const route = Router();
 const ajv = new Ajv()
@@ -36,8 +37,10 @@ async function submitLogin(e) {
     return false
 }
 
-route.get("/", (req, res) => {
-    res.render("login", { submit: submitLogin })
+route.get("/", async (req, res) => {
+    const token = req.headers.authorization
+    const isValid = token ? await verify(token) : false
+    res.render("login", { submit: submitLogin, sendAuthorization, isValid, tokenSent: Boolean(token) })
 })
 
 route.post("/", async (req, res) => {
@@ -48,7 +51,8 @@ route.post("/", async (req, res) => {
     const { username, password } = req.body
     const db_user = await db.users.login(username, password)
     if (db_user) {
-        const token = await signToken(username,db_user.role)
+        const editor = (db_user.role == admin)? true : db_user.editor
+        const token = await signToken(username,db_user.role,editor)
         res.send({ "token": token })
     }
     else {
