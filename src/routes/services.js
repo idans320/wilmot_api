@@ -4,7 +4,7 @@ import DATA_SERVICE_SCHEMA from "../schema/data_service.js"
 import db from "../shared/db.js"
 import express from "express"
 import path from "path"
-import { verify, sendAuthorization, decode } from "../shared/jws.js"
+import { verify, signToken, sendAuthorization, decode } from "../shared/jws.js"
 import { admin } from "../shared/consts.js";
 import { send } from "process";
 
@@ -33,9 +33,9 @@ const submitData = async function submitData(e, method, service, send_body, send
         indexed_array[n['name']] = n['value'];
     });
     const url = window.location.pathname + "../" + (service ? indexed_array["name"] : "")
-    
+
     indexed_array["data"] = indexed_array["data"] ? JSON.parse(indexed_array["data"]) : {}
-    const body = !send_body? null : (send_data? JSON.stringify(indexed_array.data) : JSON.stringify(indexed_array))
+    const body = !send_body ? null : (send_data ? JSON.stringify(indexed_array.data) : JSON.stringify(indexed_array))
     const result = await fetch(url, {
         method: method, body: body, headers: {
             'Content-Type': 'application/json',
@@ -53,7 +53,7 @@ const submitData = async function submitData(e, method, service, send_body, send
 
 const isAllowToEdit = async (token, role) => {
     let claims = await decode(token)
-    if (claims.role == admin || (!role && claims.editor == true ) || (claims.role == role && claims.editor == true)) {
+    if (claims.role == admin || (!role && claims.editor == true) || (claims.role == role && claims.editor == true)) {
         return true
     }
     return false
@@ -64,7 +64,7 @@ route.use(express.json())
 
 route.get(/(.*)/, async function (req, res) {
     const route = getRoute(req)
-    
+
     let service = await getServiceFromRoute(req.path)
     if (!req.originalUrl.endsWith("/") && !service) {
         return res.redirect(req.originalUrl + "/")
@@ -74,7 +74,7 @@ route.get(/(.*)/, async function (req, res) {
 })
 
 route.get('/:path*?/add_item', async function (req, res) {
-    const token = req.headers.authorization
+    const token = await tryToGenerateToken(req.headers.authorization)
     const isValid = token ? await verify(token) && await isAllowToEdit(token) : false
     let status = 200
     let user_role
@@ -88,7 +88,7 @@ route.get('/:path*?/add_item', async function (req, res) {
 
 route.get('/:path*?/delete_item', async function (req, res) {
     const route = getRoute(req)
-    const token = req.headers.authorization
+    const token = await tryToGenerateToken(req.headers.authorization)
     let role
     let status = 200
     const isValid = token ? await verify(token) && await isAllowToEdit(token) : false
@@ -102,7 +102,7 @@ route.get('/:path*?/delete_item', async function (req, res) {
 
 route.get('/:path*?/replace_item', async function (req, res) {
     const route = getRoute(req)
-    const token = req.headers.authorization
+    const token = await tryToGenerateToken(req.headers.authorization)
     let role
     let status = 200
     const isValid = token ? await verify(token) && await isAllowToEdit(token) : false
@@ -119,9 +119,29 @@ const getRoute = (req) => {
     return route.endsWith("/") ? route : route + "/"
 }
 
+const tryToGenerateToken = async (authorization) => {
+    if (authorization == undefined)
+        return undefined
 
+    if (authorization.includes("Basic") == true) {
+        const parsed_auth = Buffer.from(authorization.replace("Basic ", ""), "base64").toString().split(":")
+        console.log(parsed_auth)
+        const [username, password] = parsed_auth
+        if (username && password) {
+            if (await db.users.login(username, password)) {
+                return await signToken(username)
+            }
+            else {
+                return null
+            }
+        }
+    }
+    else {
+        return authorization
+    }
+}
 route.get('/:path*?', async function (req, res) {
-    const token = req.headers.authorization
+    const token = await tryToGenerateToken(req.headers.authorization)
     const isValid = token ? await verify(token) : false
     let role, editor;
     if (isValid) {
@@ -133,7 +153,7 @@ route.get('/:path*?', async function (req, res) {
         role = null
         editor = false
     }
-    
+
     const route = getRoute(req)
     let service = await getServiceFromRoute(route)
     let routes = await db.services.getChildrenRoutes(route)
@@ -148,8 +168,13 @@ route.get('/:path*?', async function (req, res) {
             }
         }
         let status = 200
-        if (!isAuthorized) status = 401
-        return res.status(status).render('services/display', { data: JSON.stringify(service.data), isValid: isAuthorized, tokenSent: Boolean(token), sendAuthorization: sendAuthorization })
+        if (!isAuthorized) {
+            status = 401
+            return res.status(status).render('services/display', { data: JSON.stringify(service.data), isValid: isAuthorized, tokenSent: Boolean(token), sendAuthorization: sendAuthorization })
+        }
+        else {
+            return res.json(service.data)
+        }
     }
     else {
         let services = (await db.services.getServicesInRoute(route)).filter((e) => (role == admin || e.role == role))
@@ -158,7 +183,7 @@ route.get('/:path*?', async function (req, res) {
 })
 
 route.post("/:path?*", async function (req, res) {
-    const token = req.headers.authorization
+    const token = await tryToGenerateToken(req.headers.authorization)
     const isValid = token ? await verify(token) : false
     if (isValid) {
         const route = getRoute(req)
@@ -185,7 +210,7 @@ route.post("/:path?*", async function (req, res) {
 })
 
 route.delete("/:path?*", async function (req, res) {
-    const token = req.headers.authorization
+    const token = await tryToGenerateToken(req.headers.authorization)
     const isValid = token ? await verify(token) : false
     if (isValid) {
         const route = getRoute(req)
@@ -208,7 +233,7 @@ route.delete("/:path?*", async function (req, res) {
 })
 
 route.put("/:path?*", async function (req, res) {
-    const token = req.headers.authorization
+    const token = await tryToGenerateToken(req.headers.authorization)
     const isValid = token ? await verify(token) : false
     if (isValid) {
         const data = req.body
@@ -219,7 +244,7 @@ route.put("/:path?*", async function (req, res) {
             if (isAuthorized) {
                 if (Object.keys(data).length > 0) {
                     res.sendStatus(201)
-                    db.services.replaceService(service.name,service.route,data)
+                    db.services.replaceService(service.name, service.route, data)
                 }
                 else {
                     res.sendStatus(400)
