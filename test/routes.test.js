@@ -110,6 +110,17 @@ describe('POST /admin/add_user', () => {
   });
 });
 
+describe('POST /admin/add_user', () => {
+  it('add editor', async () => {
+    let token = await login(user, password)
+    const response = await request(app).post('/admin/add_user')
+      .send({ "username": "tester_editor", "password": "tester", "role": "test", "editor": true })
+      .set('Authorization', token)
+      .set('Content-Type', 'application/json')
+      .expect(201);
+  });
+});
+
 describe('POST /services', () => {
   it('should be created', async () => {
     let token = await login(user, password)
@@ -224,5 +235,38 @@ describe('GET admin /services/test', () => {
       
       console.log(res.text);
       expect(JSON.parse(res.text).b).toBe("B")
+  });
+});
+
+describe('POST editor /services', () => {
+  it('should be created', async () => {
+    let [user,password] = ["tester_editor","tester"]
+    let token = await login(user, password)
+    await request(app).post('/services')
+      .send({ "name": "test_editor", "data": {}, "role": "test" })
+      .set('Authorization', token)
+      .set('Content-Type', 'application/json')
+      .expect(201)
+  });
+});
+
+describe('PUT editor /services/test_editor', () => {
+  it('should be created', async () => {
+    let token = await login(user, password)
+    await request(app).put('/services/test_editor')
+      .send({"b":"B"})
+      .set('Content-Type', 'application/json')
+      .set('Authorization', token)
+      .expect(201)
+  });
+});
+
+describe('DELETE editor /services/test_editor', () => {
+  it('should be created', async () => {
+    let token = await login(user, password)
+    await request(app).delete('/services/test_editor')
+      .set('Content-Type', 'application/json')
+      .set('Authorization', token)
+      .expect(201)
   });
 });

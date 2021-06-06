@@ -1,0 +1,14 @@
+extends ../layout.pug
+block content
+    if !tokenSent
+        script !{sendAuthorization}
+        script sendAuthorization(window.location, true)
+    else if !isValid
+        script window.location.href="/login/"
+    script !{submitData}
+    form(action="./", method="post" id="remove_user_form" onsubmit="return submitData(event,'post',false, true)") 
+        container(class="container")
+            select(name="username" id="users")
+                for user in users
+                    option(value=user.user)=user.user
+            button(type="submit") Remove User
