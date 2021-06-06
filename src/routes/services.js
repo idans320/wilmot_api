@@ -59,7 +59,7 @@ const isAllowToEdit = async (token, role) => {
     return false
 }
 
-route.use(express.json())
+route.use(express.json({"json":"5mb"}))
 
 
 route.get(/(.*)/, async function (req, res) {
