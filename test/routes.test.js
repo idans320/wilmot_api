@@ -1,10 +1,11 @@
 import { response } from 'express';
 import request from 'supertest';
-import app from '../src/index.js';
+import app from '../src/app.js';
 import db from "../src/shared/db"
 import admin from "./admin_user.js"
 
 const { user, password } = admin
+
 
 //without token
 
@@ -269,4 +270,19 @@ describe('DELETE editor /services/test_editor', () => {
       .set('Authorization', token)
       .expect(201)
   });
+});
+
+var server
+
+beforeAll(async () => {
+  const port = 3000
+  server = app.listen(port)
+})
+afterAll(async done => {
+  // Closing the DB connection allows Jest to exit successfully.
+  db.close()
+  await server.removeAllListeners()
+  await server.close((e) => console.error(e))
+
+  done();
 });

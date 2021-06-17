@@ -5,6 +5,9 @@ import bcrypt, { hash } from "bcrypt"
 const saltRounds = 10;
 
 export default class RochesterDB {
+    async close(){
+        this.client.close()
+    }
     async connect(host, port) {
         const url = `mongodb://${host}:${port}`;
         const dbName = 'rochester';
