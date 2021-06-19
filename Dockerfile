@@ -6,5 +6,5 @@ RUN apt-get install git nodejs -y &&  npm install yarn -g
 RUN apt-get install netcat -y 
 ADD . ./wilmot_api
 RUN cd wilmot_api && yarn install && yarn build
-RUN cd wilmot_api && chmod +x generate_keys.sh && chmod +x add_admin.sh && ./generate_keys.sh
+RUN cd wilmot_api && chmod +x generate_keys.sh && chmod +x add_admin.sh && ./generate_keys.sh && chmod +x run.sh
 CMD mongod& until nc -z localhost 27017; do sleep 1; done; cd wilmot_api && ./add_admin.sh && ./run.sh
